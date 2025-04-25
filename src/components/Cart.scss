@@ -1,0 +1,99 @@
+$primary-color: #191b43;
+$secondary-color: white;
+$button-bg-color: hsl(237, 46%, 18%);
+$font-size-large: 40px;
+$font-size-medium: 18px;
+$font-size-small: 16px;
+
+.Header {
+  .b2-products {
+    text-decoration: none;
+    color: $secondary-color;
+    background-color: $button-bg-color;
+    padding: 12px;
+    font-size: $font-size-medium;
+    font-weight: 400;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+}
+
+.Progress {
+  display: flex;
+  gap: 10px;
+  margin: 15px;
+  flex-wrap: wrap;
+
+  button {
+    font-size: $font-size-small;
+    width: 45px;
+    color: $secondary-color;
+    background-color: $primary-color;
+  }
+}
+
+.cart-heading {
+  text-align: center;
+  color: $secondary-color;
+  font-size: $font-size-large;
+  margin: 20px;
+}
+
+#cart-container {
+  background-color: $primary-color;
+  width: 90%;
+  margin: 0 auto;
+}
+
+#cart-items {
+  gap: 20px;
+  text-align: center;
+
+  .willing {
+    text-decoration: none;
+    background-color: $secondary-color;
+    color: $primary-color;
+    padding: 12px;
+    font-size: $font-size-medium;
+    font-weight: 400;
+    margin-top: 30px;
+    border-radius: 50px;
+    gap: 10px;
+    align-items: center;
+    display: flex;
+  }
+}
+
+.Empty-info {
+  .Empty {
+    color: $secondary-color;
+    font-size: 30px;
+    margin-bottom: 25px;
+  }
+}
+
+.Card {
+  p {
+    font-size: $font-size-small;
+    color: $primary-color;
+    text-align: center;
+    text-transform: capitalize;
+    font-weight: 600;
+    width: 100%;
+    margin: 10px;
+    min-height: 30px;
+  }
+
+  .price {
+    height: 40px;
+    background-color: $primary-color;
+    color: $secondary-color;
+    text-align: center;
+    padding: 15px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
