@@ -71,7 +71,6 @@ export default function Cart() {
       </>
     );
   }
-
   return (
     <>
           <Header
@@ -123,7 +122,6 @@ export default function Cart() {
                 <Button size="small" onClick={() => decrement(index)} sx={{ backgroundColor: '#191b43', color: '#fff', minWidth: 40 }}>-</Button>
                 <Typography sx={{ color: '#333' }}>{item.count}</Typography>
                 <Button size="small" onClick={() => increment(index)} sx={{ backgroundColor: '#191b43', color: '#fff', minWidth: 40 }}>+</Button>
-
               </Box>
             </Box>
           ))}

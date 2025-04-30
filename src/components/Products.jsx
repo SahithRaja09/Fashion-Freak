@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Drawer,
   Typography,
-  FormControlLabel,
-  Checkbox,
+  IconButton,
   CardMedia,
   CardActions,
   Button,
-} 
-from '@mui/material';
+  Tooltip,
+} from '@mui/material';
+import MaleIcon from '@mui/icons-material/Male';
+import FemaleIcon from '@mui/icons-material/Female';
+import CableIcon from '@mui/icons-material/Cable';
+import DiamondIcon from '@mui/icons-material/Diamond';
 import Header from './Header';
-// import { useNavigate } from 'react-router-dom';
-
 import Wishlist from './Wishlist';
-// import WishlistButton from './WishlistButton';
-
 
 const categoryOptions = [
   { label: "Mens", value: "men's clothing" },
@@ -28,11 +26,9 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [cart, setCart] = useState([]);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [filters, setFilters] = useState({});
   const [wishlist, setWishlist] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  // const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -58,9 +54,9 @@ export default function Products() {
     setFiltered(temp);
   }, [filters, searchTerm, products]);
 
-  const toggleDrawer = open => () => setDrawerOpen(open);
-  const handleFilter = value => e =>
-    setFilters(prev => ({ ...prev, [value]: e.target.checked }));
+  const handleFilterToggle = value => {
+    setFilters(prev => ({ ...prev, [value]: !prev[value] }));
+  };
 
   const addToCart = product => {
     setCart(prev => {
@@ -90,55 +86,138 @@ export default function Products() {
       return updated;
     });
   };
-  
 
-  function ProductCard({ product, wishlist, onToggleWishlist }) {
+  const toggleWishlist = product => {
+    const exists = wishlist.some(item => item.id === product.id);
+    setWishlist(exists ? wishlist.filter(item => item.id !== product.id) : [...wishlist, product]);
+  };
+
+  function ProductCard({ product }) {
     const isWishlisted = wishlist.some(item => item.id === product.id);
+    const cartItem = cart.find(item => item.id === product.id);
 
     return (
-      <Box sx={{ border: '1px solid #ddd',display:'inline-flex',justifyContent:'center', borderRadius: 2 }}>
-        <h3>{product.name}</h3>
-        <Wishlist
-          isWishlisted={isWishlisted}
-          onClick={() => onToggleWishlist(product)}
+      <Box
+        key={product.id}
+        sx={{
+          width: 280,
+          minHeight: 440,
+          bgcolor: 'aliceblue',
+          borderRadius: 2,
+          boxShadow: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          transition: 'transform 0.3s ease-out',
+          '&:hover': { transform: 'scale(1.05)', boxShadow: 6 },
+          p: 2,
+        }}
+      >
+        <CardMedia
+          component="img"
+          image={product.image}
+          alt={product.title}
+          sx={{ height: 200, width: '100%', objectFit: 'contain', borderRadius: 2 }}
         />
+        <Box sx={{ textAlign: 'center', mt: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              color: '#191b43',
+              fontSize: '16px',
+              height: 48,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {product.title}
+          </Typography>
+          <Typography sx={{ textTransform: 'capitalize', color: '#191b43' }}>
+            {product.category}
+          </Typography>
+
+          <Typography sx={{ mt: 1, fontWeight: 600 }}>
+            ${cartItem ? cartItem.price.toFixed(2) : product.price.toFixed(2)}
+          </Typography>
+
+          <CardActions sx={{ justifyContent: 'center', mt: 1 }}>
+            {cartItem && cartItem.count > 0 ? (
+              <>
+                <Button
+                  size="small"
+                  onClick={() => decrement(product.id)}
+                  sx={{ backgroundColor: '#191b43', color: '#fff', minWidth: 40 }}
+                >
+                  -
+                </Button>
+                <Typography sx={{ mx: 1 }}>{cartItem.count}</Typography>
+                <Button
+                  size="small"
+                  onClick={() => addToCart(product)}
+                  sx={{ backgroundColor: '#191b43', color: '#fff', minWidth: 40 }}
+                >
+                  +
+                </Button>
+              </>
+            ) : (
+              <Button
+                size="small"
+                onClick={() => addToCart(product)}
+                sx={{ backgroundColor: '#191b43', color: '#fff' }}
+              >
+                Add to Cart
+              </Button>
+            )}
+          </CardActions>
+
+          <Box sx={{ borderTop: '1px solid #ddd', width: '100%', mt: 2, textAlign: 'center' }}>
+            <Wishlist isWishlisted={isWishlisted} onClick={() => toggleWishlist(product)} />
+          </Box>
+        </Box>
       </Box>
     );
   }
 
-  const toggleWishlist = (product) => {
-    const exists = wishlist.some(item => item.id === product.id);
-    if (exists) {
-      setWishlist(wishlist.filter(item => item.id !== product.id));
-    } else {
-      setWishlist([...wishlist, product]);
+  const getCategoryIcon = label => {
+    switch (label) {
+      case "Mens":
+        return <MaleIcon />;
+      case "Womens":
+        return <FemaleIcon />;
+      case "Electronics":
+        return <CableIcon />;
+      case "Jewelry":
+        return <DiamondIcon />;
+      default:
+        return null;
     }
   };
-  
-  return (
-    <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh' }}>
-      <Header
-        showSearch
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        onMenuClick={toggleDrawer(true)}
-        cartCount={cart.reduce((total, item) => total + item.count, 0)}
-      />
 
-      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
-        <Box sx={{ width: 250, p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Filters
-          </Typography>
+  return (
+    <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', overflowX: 'hidden' }}>
+      <Box sx={{ position: 'sticky', top: 0, zIndex: 1000, bgcolor: '#ffffff', boxShadow: 2 }}>
+        <Header
+          showSearch
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          cartCount={cart.reduce((total, item) => total + item.count, 0)}
+        />
+
+        {/* Filter icons in header */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
           {categoryOptions.map(opt => (
-            <FormControlLabel
-              key={opt.value}
-              control={<Checkbox checked={!!filters[opt.value]} onChange={handleFilter(opt.value)} />}
-              label={opt.label}
-            />
+            <Tooltip key={opt.value} title={opt.label}>
+              <IconButton
+                onClick={() => handleFilterToggle(opt.value)}
+                color={filters[opt.value] ? 'primary' : 'default'}
+              >
+                {getCategoryIcon(opt.label)}
+              </IconButton>
+            </Tooltip>
           ))}
         </Box>
-      </Drawer>
+      </Box>
 
       <Box
         sx={{
@@ -146,84 +225,13 @@ export default function Products() {
           flexWrap: 'wrap',
           justifyContent: 'center',
           gap: 2,
-          p: 2,
+          px: 1,
+          py: 2,
           bgcolor: '#191b43',
         }}
       >
         {filtered.length > 0 ? (
-          filtered.map(product => {
-            const cartItem = cart.find(cartItem => cartItem.id === product.id);
-            return (
-              <Box
-                key={product.id}
-                sx={{
-                  flex: '250px',
-                  maxWidth: '300px',
-                  bgcolor: 'aliceblue',
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  transition: 'transform 0.3s ease-out',
-                  '&:hover': { transform: 'scale(1.05)', boxShadow: 6 },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={product.image}
-                  alt={product.title}
-                  sx={{ height: 200, width: '100%', objectFit: 'contain', borderRadius: 2 }}
-                />
-                <Box sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="h6" sx={{ color: '#191b43', fontSize: '20px' }}>
-                    {product.title}
-                  </Typography>
-                  <Typography sx={{ textTransform: 'capitalize', color: '#191b43' }}>
-                    {product.category}
-                  </Typography>
-                  <Typography sx={{ mt: 1, mb: 2, fontWeight: 600 }}>
-                  ${cartItem ? cartItem.price.toFixed(2) : product.price}
-                  </Typography>
-                  <CardActions sx={{ justifyContent: 'center' }}>
-  {cartItem && cartItem.count > 0 ? (
-    <>
-      <Button
-        size="small"
-        onClick={() => decrement(product.id)}
-        sx={{ backgroundColor: '#191b43', color: '#fff', minWidth: 40 }}
-      >
-        -
-      </Button>
-      <Typography sx={{ mx: 1 }}>{cartItem.count}</Typography>
-      <Button
-        size="small"
-        onClick={() => addToCart(product)}
-        sx={{ backgroundColor: '#191b43', color: '#fff', minWidth: 40 }}
-      >
-        +
-      </Button>
-    </>
-  ) : (
-    <Button
-      size="small"
-      onClick={() => addToCart(product)}
-      sx={{ backgroundColor: '#191b43', color: '#fff' }}
-    >
-      Add to Cart
-    </Button>
-  )}
-</CardActions>
-
-<ProductCard
-  product={product}
-  wishlist={wishlist}
-  onToggleWishlist={toggleWishlist}
-/>
-                </Box>
-              </Box>
-            );
-          })
+          filtered.map(product => <ProductCard key={product.id} product={product} />)
         ) : (
           <Typography sx={{ color: '#fff' }}>No Products Found.</Typography>
         )}
