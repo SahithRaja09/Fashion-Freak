@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  IconButton,
   CardMedia,
   CardActions,
   Button,
   Tooltip,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  MenuItem,
+  Select,
+  Checkbox,
+  ListItemText,
 } from '@mui/material';
-import MaleIcon from '@mui/icons-material/Male';
-import FemaleIcon from '@mui/icons-material/Female';
-import CableIcon from '@mui/icons-material/Cable';
-import DiamondIcon from '@mui/icons-material/Diamond';
 import Header from './Header';
 import Wishlist from './Wishlist';
 
@@ -137,11 +139,10 @@ export default function Products() {
             {product.category}
           </Typography>
 
-          <Typography sx={{ mt: 1, fontWeight: 600 }}>
-            ${cartItem ? cartItem.price.toFixed(2) : product.price.toFixed(2)}
-          </Typography>
-
           <CardActions sx={{ justifyContent: 'center', mt: 1 }}>
+            <Typography sx={{ mr: 2, fontWeight: 600, color: '#191b43' }}>
+              ${cartItem ? cartItem.price.toFixed(2) : product.price.toFixed(2)}
+            </Typography>
             {cartItem && cartItem.count > 0 ? (
               <>
                 <Button
@@ -179,21 +180,6 @@ export default function Products() {
     );
   }
 
-  const getCategoryIcon = label => {
-    switch (label) {
-      case "Mens":
-        return <MaleIcon />;
-      case "Womens":
-        return <FemaleIcon />;
-      case "Electronics":
-        return <CableIcon />;
-      case "Jewelry":
-        return <DiamondIcon />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', overflowX: 'hidden' }}>
       <Box sx={{ position: 'sticky', top: 0, zIndex: 1000, bgcolor: '#ffffff', boxShadow: 2 }}>
@@ -204,18 +190,46 @@ export default function Products() {
           cartCount={cart.reduce((total, item) => total + item.count, 0)}
         />
 
-        {/* Filter icons in header */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
-          {categoryOptions.map(opt => (
-            <Tooltip key={opt.value} title={opt.label}>
-              <IconButton
-                onClick={() => handleFilterToggle(opt.value)}
-                color={filters[opt.value] ? 'primary' : 'default'}
-              >
-                {getCategoryIcon(opt.label)}
-              </IconButton>
-            </Tooltip>
-          ))}
+        {/* Filter dropdown */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+          <FormControl sx={{ minWidth: 300 }}>
+            <InputLabel id="category-filter-label">Filter by Category</InputLabel>
+            <Select
+              labelId="category-filter-label"
+              id="category-filter"
+              multiple
+              value={Object.keys(filters).filter(key => filters[key])}
+              onChange={(e) => {
+                const value = e.target.value;
+                const newFilters = {};
+                categoryOptions.forEach(opt => {
+                  newFilters[opt.value] = value.includes(opt.value);
+                });
+                setFilters(newFilters);
+              }}
+              input={<OutlinedInput label="Filter by Category" />}
+              renderValue={(selected) =>
+                selected
+                  .map(val => categoryOptions.find(opt => opt.value === val)?.label || val)
+                  .join(', ')
+              }
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 48 * 4.5 + 8,
+                    width: 250,
+                  },
+                },
+              }}
+            >
+              {categoryOptions.map(opt => (
+                <MenuItem key={opt.value} value={opt.value}>
+                  <Checkbox checked={filters[opt.value] || false} />
+                  <ListItemText primary={opt.label} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
       </Box>
 

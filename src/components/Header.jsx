@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, IconButton, Box, TextField } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+// import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import fashionLogo from './fashion.avif'; 
@@ -28,7 +28,7 @@ export default function Header({
 
           {showSearch && (
             <TextField
-              placeholder="Search cart items..."
+              placeholder="Search..."
               size="small"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -42,9 +42,9 @@ export default function Header({
             </Badge>
           </IconButton>
 
-          <IconButton onClick={onMenuClick}>
+          {/* <IconButton onClick={onMenuClick}>
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
 
           <IconButton edge="end">
             <PeopleAltIcon />
